@@ -11,6 +11,7 @@ class KeyGenerator
     /**
      * @param $email
      * @param $csrfToken
+     *
      * @return static
      */
     public function generate($email, $csrfToken, $ipAddress)
@@ -20,7 +21,7 @@ class KeyGenerator
             ->update([
                 'is_valid' => 0,
             ]);
-        
+
         $key = Key::create([
             'email' => $email,
             'token' => $csrfToken,
@@ -29,7 +30,7 @@ class KeyGenerator
             'expires_at' => $this->getExpiry(),
             'is_valid' => 1,
         ]);
-        
+
         return $key;
     }
 
@@ -37,16 +38,17 @@ class KeyGenerator
      * @param $email
      * @param $csrfToken
      * @param $key
+     *
      * @return bool|string Will return the email address of the authenticated user (or FALSE if none)
      */
     public function authenticate($email, $csrfToken, $ipAddress, $key)
     {
-        /** @var \Montopolis\MagicAuth\Models\Key $key */
+        /* @var \Montopolis\MagicAuth\Models\Key $key */
         $keyObject = Key::where('email', $email)
             ->where('is_valid', 1)
             ->orderBy('created_at', 'DESC')
             ->first();
-        
+
         if ($keyObject->attempt($csrfToken, $key, $ipAddress)) {
             return $email;
         } else {
@@ -56,6 +58,7 @@ class KeyGenerator
 
     /**
      * @param $key
+     *
      * @return mixed
      */
     public function generateUrl($key)
@@ -65,7 +68,8 @@ class KeyGenerator
             "_token={$key->token}",
             "key={$key->key}",
         ];
-        return url('magic-auth/login?' . implode('&', $parts));
+
+        return url('magic-auth/login?'.implode('&', $parts));
     }
 
     /**

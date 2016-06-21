@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Montopolis\MagicAuth\Http\Controllers;
 
@@ -13,12 +13,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class AuthController extends Controller
 {
     /**
-     * POST magic-auth/create
+     * POST magic-auth/create.
      * 
      * Generates a key that can be used for magic authentication.
      *
      * @param PostCreateRequest $request
-     * @param KeyGenerator $keyGenerator
+     * @param KeyGenerator      $keyGenerator
+     *
      * @return mixed
      */
     public function postCreate(PostCreateRequest $request, KeyGenerator $keyGenerator)
@@ -32,18 +33,18 @@ class AuthController extends Controller
 
         //$this->sendSlackMessage($email, "Here is your magic link:\n\n{$link}");
         $this->sendSlackMessage($email, "Your temporary password is *{$key->key}*... You can log in using this temporary password for the next 5 minutes.");
-        
+
         return response()->json([
-            'message' => ['email' => $email]
+            'message' => ['email' => $email],
         ]);
     }
 
     /**
-     * GET magic-auth/login
+     * GET magic-auth/login.
      * 
      * Magic authentication via a URL
      * 
-     * @param Request $request
+     * @param Request      $request
      * @param KeyGenerator $keyGenerator
      */
     public function getLogin(Request $request, KeyGenerator $keyGenerator)
@@ -67,33 +68,31 @@ class AuthController extends Controller
     }
 
     /**
-     * POST magic-auth/verify
+     * POST magic-auth/verify.
      * 
      * Magic auth via a OTP (one time password)
      * 
      * @param PostVerifyRequest $request
-     * @param KeyGenerator $keyGenerator
-     * @param Authenticator $auth
+     * @param KeyGenerator      $keyGenerator
+     * @param Authenticator     $auth
      */
     public function postVerify(PostVerifyRequest $request, KeyGenerator $keyGenerator, Authenticator $auth)
     {
         $email = $request->get('email');
         $token = $request->get('_token');
         $ip = $request->ip();
-        $key   = $request->get('key');
-        
+        $key = $request->get('key');
+
         if ($keyGenerator->authenticate($email, $token, $ip, $key)) {
-            
             $auth->login($email);
             redirect()->to('/');
-            
         } else {
-            throw new AccessDeniedHttpException;
+            throw new AccessDeniedHttpException();
         }
     }
 
     /**
-     * Notify via Slack
+     * Notify via Slack.
      * 
      * @param $email
      * @param $message

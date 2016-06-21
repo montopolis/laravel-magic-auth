@@ -13,7 +13,7 @@ class PostCreateRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            '_token' => 'required|string|min:20'
+            '_token' => 'required|string|min:20',
         ];
     }
 
@@ -27,6 +27,7 @@ class PostCreateRequest extends FormRequest
 
     /**
      * @param array $errors
+     *
      * @return mixed
      */
     public function response(array $errors)

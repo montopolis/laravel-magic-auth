@@ -14,11 +14,11 @@ class ServiceProvider extends BaseServiceProvider
         if (!$this->app->routesAreCached()) {
             // define router as it will be used by the routes file
             $router = $this->app->router;
-            require(__DIR__.'/../Http/routes.php');
+            require __DIR__.'/../Http/routes.php';
         }
 
         // publish config file (if relevant)
-        $key = __DIR__ . self::CONFIG_PATH;
+        $key = __DIR__.self::CONFIG_PATH;
         $this->publishes([
             "{$key}" => config_path('montopolis_magic_auth.php'),
         ]);
@@ -26,13 +26,11 @@ class ServiceProvider extends BaseServiceProvider
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . self::CONFIG_PATH, 'courier'
+            __DIR__.self::CONFIG_PATH, 'courier'
         );
     }
 }
