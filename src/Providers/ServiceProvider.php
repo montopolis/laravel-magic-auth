@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
-    const CONFIG_PATH = '../config/montopolis_magic_auth.php';
+    const CONFIG_PATH = '../../config/montopolis_magic_auth.php';
 
     public function boot()
     {

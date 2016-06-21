@@ -1,0 +1,28 @@
+{
+    "name": "montopolis/laravel-magic-auth",
+    "description": "Package for implementing magical authentication (URL and token) in Laravel 5.2+",
+    "type": "package",
+    "keywords": ["laravel", "slack", "authentication", "otp", "magic"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Corey Mcmahon",
+            "email": "contact@coreymcmahon.com"
+        },
+        {
+            "name": "Babul Mukherjee",
+            "email": "babul@montopolis.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.9",
+        "laravel/framework": "5.2.*",
+        "guzzlehttp/guzzle": "^6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Montopolis\\MagicAuth\\": "src"
+        }
+    }
+}
