@@ -1,7 +1,7 @@
 <?php
 
 return [
-    // may support email, sms in future
+    
     'channel' => 'slack',
 
     'services' => [
@@ -12,4 +12,14 @@ return [
             'mode' => 'pin',
         ],
     ],
+
+    /**
+     * This is the adapter tha will be used to perform the user sign-in
+     */
+    'auth_adapter' => Montopolis\MagicAuth\Services\Auth\LaravelAdapter::class,
+
+    /**
+     * Lifetime of sign-in token (in seconds)
+     */
+    'timeout' => 300,
 ];

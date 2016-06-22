@@ -78,6 +78,6 @@ class KeyGenerator
     public function getExpiry()
     {
         // @todo: extract as a config var?
-        return Carbon::now()->addMinutes(5);
+        return Carbon::now()->addSeconds(config(''));
     }
 }

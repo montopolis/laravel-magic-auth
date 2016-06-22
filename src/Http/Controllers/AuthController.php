@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Montopolis\MagicAuth\Http\Requests\PostCreateRequest;
 use Montopolis\MagicAuth\Http\Requests\PostVerifyRequest;
+use Montopolis\MagicAuth\Services\Auth\AdapterInterface;
 use Montopolis\MagicAuth\Services\Authenticator;
 use Montopolis\MagicAuth\Services\KeyGenerator;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -29,9 +30,7 @@ class AuthController extends Controller
 
         // @todo: trusted proxies
         $key = $keyGenerator->generate($email, $token, $request->getClientIp());
-        //$link = $keyGenerator->generateUrl($key);
-
-        //$this->sendSlackMessage($email, "Here is your magic link:\n\n{$link}");
+        
         $this->sendSlackMessage($email, "Your temporary password is *{$key->key}*... You can log in using this temporary password for the next 5 minutes.");
 
         return response()->json([
@@ -47,7 +46,7 @@ class AuthController extends Controller
      * @param Request      $request
      * @param KeyGenerator $keyGenerator
      */
-    public function getLogin(Request $request, KeyGenerator $keyGenerator)
+    public function getLogin(Request $request, KeyGenerator $keyGenerator, AdapterInterface $auth)
     {
         $email = $request->get('email');
         $csrf = $request->get('_token');
@@ -55,16 +54,20 @@ class AuthController extends Controller
         $key = $request->get('key');
 
         // @todo: generalise this
-        $user = app()->make('ZedTools\Models\User')->where('email', $email)->first();
+        $user = $auth->findByEmail($email);
 
-        if ($keyGenerator->authenticate($email, $csrf, $ip, $key)) {
+        if ($keyGenerator->authenticate($user ? $email : '', $csrf, $ip, $key)) {
             $this->sendSlackMessage($email, 'Logged in :)');
+            
             // login user
-            // invalidate key
+            $auth->loginByEmail($email);
+            
             // redirect home
+            // @todo: make configurable
+            return redirect()->url('/');
         }
 
-        // redirect with error message
+        throw new AccessDeniedHttpException;
     }
 
     /**
@@ -74,9 +77,9 @@ class AuthController extends Controller
      * 
      * @param PostVerifyRequest $request
      * @param KeyGenerator      $keyGenerator
-     * @param Authenticator     $auth
+     * @param AdapterInterface  $auth
      */
-    public function postVerify(PostVerifyRequest $request, KeyGenerator $keyGenerator, Authenticator $auth)
+    public function postVerify(PostVerifyRequest $request, KeyGenerator $keyGenerator, AdapterInterface $auth)
     {
         $email = $request->get('email');
         $token = $request->get('_token');
@@ -87,7 +90,7 @@ class AuthController extends Controller
             $auth->login($email);
             redirect()->to('/');
         } else {
-            throw new AccessDeniedHttpException();
+            throw new AccessDeniedHttpException;
         }
     }
 
