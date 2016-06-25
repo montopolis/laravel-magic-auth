@@ -32,10 +32,9 @@ In config/app.php inside the providers array...
 ### Publish (and update) configuration
 
 ```
-(tba)
+$ php artisan vendor:publish
+$ vi config/montopolis_magic_auth.php
 ```
-
-### Contributing
 
 ### License
 

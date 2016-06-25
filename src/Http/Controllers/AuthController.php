@@ -9,6 +9,7 @@ use Montopolis\MagicAuth\Http\Requests\PostVerifyRequest;
 use Montopolis\MagicAuth\Services\Auth\AdapterInterface;
 use Montopolis\MagicAuth\Services\KeyGenerator;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthController extends Controller
 {
@@ -27,10 +28,16 @@ class AuthController extends Controller
         $email = $request->get('email');
         $token = $request->get('_token');
 
+        $member = $this->findSlackMember($email);
+
+        if (!$member) {
+            throw new NotFoundHttpException("Could not find Slack user for email address: {$email}");
+        }
+
         // @todo: trusted proxies
         $key = $keyGenerator->generate($email, $token, $request->getClientIp());
         
-        $this->sendSlackMessage($email, "Your temporary password is *{$key->key}*... You can log in using this temporary password for the next 5 minutes.");
+        $this->sendSlackMessage($member, "Your temporary password is *{$key->key}*... You can log in using this temporary password for the next 5 minutes.");
 
         return response()->json([
             'message' => ['email' => $email],
@@ -90,15 +97,28 @@ class AuthController extends Controller
 
     /**
      * Notify via Slack.
-     * 
+     *
      * @param $email
-     * @param $message
+     * @return bool|\Montopolis\MagicAuth\Integrations\Slack\stdClass
      */
-    protected function sendSlackMessage($email, $message)
+    protected function findSlackMember($email)
     {
         /** @var \Montopolis\MagicAuth\Integrations\Slack\Client $s */
         $s = app()->make('Montopolis\MagicAuth\Integrations\Slack\Client');
         $member = $s->fetchByEmail($email);
+        return $member;
+    }
+
+    /**
+     * Notify via Slack.
+     *
+     * @param $member
+     * @param $message
+     */
+    protected function sendSlackMessage($member, $message)
+    {
+        /** @var \Montopolis\MagicAuth\Integrations\Slack\Client $s */
+        $s = app()->make('Montopolis\MagicAuth\Integrations\Slack\Client');
         $s->sendMessage($member->name, $message);
     }
 }
