@@ -29,7 +29,7 @@ class LaravelAdapter implements AdapterInterface
         $user = $this->findByEmail($email);
         
         if ($user) {
-            app()->make('guard')->setUser($user);
+            app()->make('auth')->login($user);
             return true;
         }
         
