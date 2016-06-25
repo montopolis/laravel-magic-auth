@@ -18,13 +18,8 @@ class ServiceProvider extends BaseServiceProvider
     public function boot()
     {
         // Define routes
-        //if (!$this->app->routesAreCached()) {
-
-        // define router as it will be used by the routes file
         $router = $this->app->router;
         require __DIR__.'/../Http/routes.php';
-
-        //}
 
         // Publish config file (if not yet published)
         $path = __DIR__ . self::CONFIG_PATH;

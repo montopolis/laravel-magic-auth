@@ -43,7 +43,7 @@ class KeyGenerator
      */
     public function authenticate($email, $csrfToken, $ipAddress, $key)
     {
-        /* @var \Montopolis\MagicAuth\Models\Key $key */
+        /* @var \Montopolis\MagicAuth\Models\Key $keyObject */
         $keyObject = Key::where('email', $email)
             ->where('is_valid', 1)
             ->orderBy('created_at', 'DESC')
@@ -77,7 +77,6 @@ class KeyGenerator
      */
     public function getExpiry()
     {
-        // @todo: extract as a config var?
-        return Carbon::now()->addSeconds(config(''));
+        return Carbon::now()->addSeconds(config('montopolis_magic_auth.timeout'));
     }
 }

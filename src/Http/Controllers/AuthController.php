@@ -7,7 +7,6 @@ use Illuminate\Routing\Controller;
 use Montopolis\MagicAuth\Http\Requests\PostCreateRequest;
 use Montopolis\MagicAuth\Http\Requests\PostVerifyRequest;
 use Montopolis\MagicAuth\Services\Auth\AdapterInterface;
-use Montopolis\MagicAuth\Services\Authenticator;
 use Montopolis\MagicAuth\Services\KeyGenerator;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -57,14 +56,9 @@ class AuthController extends Controller
         $user = $auth->findByEmail($email);
 
         if ($keyGenerator->authenticate($user ? $email : '', $csrf, $ip, $key)) {
-            $this->sendSlackMessage($email, 'Logged in :)');
-            
             // login user
             $auth->loginByEmail($email);
-            
-            // redirect home
-            // @todo: make configurable
-            return redirect()->url('/');
+            return redirect()->to('/');
         }
 
         throw new AccessDeniedHttpException;
@@ -87,7 +81,7 @@ class AuthController extends Controller
         $key = $request->get('key');
 
         if ($keyGenerator->authenticate($email, $token, $ip, $key)) {
-            $auth->login($email);
+            $auth->loginByEmail($email);
             redirect()->to('/');
         } else {
             throw new AccessDeniedHttpException;
