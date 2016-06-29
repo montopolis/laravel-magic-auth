@@ -1,5 +1,5 @@
-@include('otp')
+@include('montopolis_magic_auth::messages.otp')
 
 ---
 
-@include('link')
+@include('montopolis_magic_auth::messages.link')

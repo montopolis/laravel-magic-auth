@@ -90,7 +90,8 @@ class KeyGenerator
         
         while (strlen($pin) < (int) config('montopolis_magic_auth.pin_length')) {
             // note: should look at replacing mt_rand as a possible refactor
-            $pin .= $alphabet[mt_rand(0, count($alphabet) - 1)];
+            $index = mt_rand(0, strlen($alphabet) - 1);
+            $pin .= $alphabet[$index];
         }
         
         return $pin;

@@ -5,7 +5,7 @@ return [
     /**
      * OTP delivery mechanism: slack, email, or both
      */
-    'channel' => 'email',
+    'channel' => 'slack',
 
     /**
      * OTP usage mechanism: otp, link or both

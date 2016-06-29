@@ -1,1 +1,1 @@
-Your temporary password is *{$key->key}*... You can log in using this temporary password for the next 5 minutes.
+Your temporary password is *{{$key->key}}*... You can log in using this temporary password for the next 5 minutes.
