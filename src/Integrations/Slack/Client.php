@@ -8,15 +8,7 @@ class Client
 {
     /**
      * @param $email
-     *
      * @return bool
-     *              {#298 ▼
-     */
-
-    /**
-     * @param $email
-     *
-     * @return bool|stdClass
      */
     public function fetchByEmail($email)
     {

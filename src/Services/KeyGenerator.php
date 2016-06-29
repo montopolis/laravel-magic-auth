@@ -3,7 +3,6 @@
 namespace Montopolis\MagicAuth\Services;
 
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 use Montopolis\MagicAuth\Models\Key;
 
 class KeyGenerator
@@ -26,7 +25,7 @@ class KeyGenerator
             'email' => $email,
             'token' => $csrfToken,
             'ip_address' => $ipAddress,
-            'key' => strtoupper(Str::random(6)),
+            'key' => $this->generateNewPin(),
             'expires_at' => $this->getExpiry(),
             'is_valid' => 1,
         ]);
@@ -78,5 +77,39 @@ class KeyGenerator
     public function getExpiry()
     {
         return Carbon::now()->addSeconds(config('montopolis_magic_auth.timeout'));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function generateNewPin()
+    {
+        $pin = '';
+
+        $alphabet = $this->generateAlphabet();
+        
+        while (strlen($pin) < (int) config('montopolis_magic_auth.pin_length')) {
+            // note: should look at replacing mt_rand as a possible refactor
+            $pin .= $alphabet[mt_rand(0, count($alphabet) - 1)];
+        }
+        
+        return $pin;
+    }
+
+    /**
+     * @return string
+     */
+    public function generateAlphabet()
+    {
+        $style = config('montopolis_magic_auth.pin_style');
+        
+        if ($style === 'alpha') {
+            return 'ABCDEFGHJKLMNPQRSTUXYZ';
+        } elseif ($style === 'numeric') {
+            return '1234567890';
+        }
+
+        // for alphanumeric we use a reduced character set to avoid confusion (e.g: i ~ 1, o ~ 0)
+        return 'ABCDEFGHJKLMNPQRSTUXYZ23456789';
     }
 }

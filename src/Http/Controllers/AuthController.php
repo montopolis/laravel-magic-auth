@@ -8,6 +8,7 @@ use Montopolis\MagicAuth\Http\Requests\PostCreateRequest;
 use Montopolis\MagicAuth\Http\Requests\PostVerifyRequest;
 use Montopolis\MagicAuth\Services\Auth\AdapterInterface;
 use Montopolis\MagicAuth\Services\KeyGenerator;
+use Montopolis\MagicAuth\Services\NotificationManager;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -23,7 +24,7 @@ class AuthController extends Controller
      *
      * @return mixed
      */
-    public function postCreate(PostCreateRequest $request, KeyGenerator $keyGenerator)
+    public function postCreate(PostCreateRequest $request, KeyGenerator $keyGenerator, NotificationManager $notifier)
     {
         $email = $request->get('email');
         $token = $request->get('_token');
@@ -33,11 +34,13 @@ class AuthController extends Controller
         if (!$member) {
             throw new NotFoundHttpException("Could not find Slack user for email address: {$email}");
         }
-
+        
         // @todo: trusted proxies
+
+        // Generate a one time password 
         $key = $keyGenerator->generate($email, $token, $request->getClientIp());
         
-        $this->sendSlackMessage($member, "Your temporary password is *{$key->key}*... You can log in using this temporary password for the next 5 minutes.");
+        $notifier->sendKey($key);
 
         return response()->json([
             'message' => ['email' => $email],
@@ -54,6 +57,10 @@ class AuthController extends Controller
      */
     public function getLogin(Request $request, KeyGenerator $keyGenerator, AdapterInterface $auth)
     {
+        if (!in_array(config('montopolis_magic_auth.mode'), ['link', 'both'])) {
+            throw new AccessDeniedHttpException('"link" authentication mode is not enabled');
+        }
+
         $email = $request->get('email');
         $csrf = $request->get('_token');
         $ip = $request->ip();
@@ -62,7 +69,7 @@ class AuthController extends Controller
         // @todo: generalise this
         $user = $auth->findByEmail($email);
 
-        if ($keyGenerator->authenticate($user ? $email : '', $csrf, $ip, $key)) {
+        if ($user && $keyGenerator->authenticate($email, $csrf, $ip, $key)) {
             // login user
             $auth->loginByEmail($email);
             return redirect()->to('/');
@@ -82,6 +89,10 @@ class AuthController extends Controller
      */
     public function postVerify(PostVerifyRequest $request, KeyGenerator $keyGenerator, AdapterInterface $auth)
     {
+        if (!in_array(config('montopolis_magic_auth.mode'), ['otp', 'both'])) {
+            throw new AccessDeniedHttpException('"otp" authentication mode is not enabled');
+        }
+
         $email = $request->get('email');
         $token = $request->get('_token');
         $ip = $request->ip();
@@ -107,18 +118,5 @@ class AuthController extends Controller
         $s = app()->make('Montopolis\MagicAuth\Integrations\Slack\Client');
         $member = $s->fetchByEmail($email);
         return $member;
-    }
-
-    /**
-     * Notify via Slack.
-     *
-     * @param $member
-     * @param $message
-     */
-    protected function sendSlackMessage($member, $message)
-    {
-        /** @var \Montopolis\MagicAuth\Integrations\Slack\Client $s */
-        $s = app()->make('Montopolis\MagicAuth\Integrations\Slack\Client');
-        $s->sendMessage($member->name, $message);
     }
 }

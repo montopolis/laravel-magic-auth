@@ -2,19 +2,25 @@
 
 return [
     
-    'channel' => 'slack',
-
-    'services' => [
-        'slack' => [
-            'token' => 'xxxxx',
-            'bot_name' => 'montopolis_magic_auth',
-            // otp, link or both
-            'mode' => 'pin',
-        ],
-    ],
+    /**
+     * OTP delivery mechanism: slack, email, or both
+     */
+    'channel' => 'email',
 
     /**
-     * This is the adapter tha will be used to perform the user sign-in
+     * OTP usage mechanism: otp, link or both
+     */
+    'mode' => 'both',
+
+    /**
+     * PIN (OTP) parameters. Style can be: alpha, numeric, or alphanumeric
+     */
+    'pin_length' => 6,
+    'pin_style' => 'alphanumeric',
+
+    /**
+     * This is the adapter that will be used to perform the user sign-in. Must implement this interface:
+     *      Montopolis\MagicAuth\Services\Auth\AdapterInterface
      */
     'auth_adapter' => Montopolis\MagicAuth\Services\Auth\LaravelAdapter::class,
 
@@ -22,4 +28,16 @@ return [
      * Lifetime of sign-in token (in seconds)
      */
     'timeout' => 300,
+
+    /**
+     * Notification channel(s).
+     *      TOKEN(S) MUST BE SUPPLIED!
+     */
+    'services' => [
+
+        'slack' => [
+            'token' => 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            'bot_name' => 'montopolis_magic_auth',
+        ],
+    ],
 ];

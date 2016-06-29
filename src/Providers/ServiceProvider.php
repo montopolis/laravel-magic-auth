@@ -11,6 +11,7 @@ class ServiceProvider extends BaseServiceProvider
      *
      */
     const CONFIG_PATH = '/../../config/montopolis_magic_auth.php';
+    const VIEW_PATH = '/../../views';
 
     /**
      *
@@ -22,10 +23,14 @@ class ServiceProvider extends BaseServiceProvider
         require __DIR__.'/../Http/routes.php';
 
         // Publish config file (if not yet published)
-        $path = __DIR__ . self::CONFIG_PATH;
+        $configPath = __DIR__ . self::CONFIG_PATH;
         $this->publishes([
-            "{$path}" => config_path('montopolis_magic_auth.php'),
+            "{$configPath}" => config_path('montopolis_magic_auth.php'),
         ]);
+
+        // Define views
+        $viewPath = __DIR__ . self::VIEW_PATH;
+        $this->loadViewsFrom($viewPath, 'montopolis_magic_auth');
     }
 
     /**

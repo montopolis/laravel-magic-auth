@@ -55,9 +55,17 @@ class Key extends Model
             return false;
         }
 
-        return ($this->ip_address === $ipAddress) &&
+        // test the auth conditions
+        $valid = ($this->ip_address === $ipAddress) &&
             ($this->token === $csrfToken) &&
             ($this->key === $key);
+        
+        // if valid, revoke the token
+        if ($valid) {
+            $this->invalidate();
+        }
+        
+        return $valid;
     }
 
     /**
