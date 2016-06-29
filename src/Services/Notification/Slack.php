@@ -1,4 +1,4 @@
-<?php namespace Montopolis\MagicAuth\Services\Auth;
+<?php namespace Montopolis\MagicAuth\Services\Notification;
 
 use Montopolis\MagicAuth\Integrations\Slack\Client;
 

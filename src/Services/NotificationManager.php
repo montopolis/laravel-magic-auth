@@ -17,8 +17,8 @@ class NotificationManager
     
     public function sendSlackKey($key)
     {
-        /** @var \Montopolis\MagicAuth\Services\Auth\Slack $slackNotifier */
-        $slackNotifier = app()->make('Montopolis\MagicAuth\Services\Auth\Slack');
+        /** @var \Montopolis\MagicAuth\Services\Notification\Slack $slackNotifier */
+        $slackNotifier = app()->make('Montopolis\MagicAuth\Services\Notification\Slack');
         $slackNotifier->sendKey($key);
     }
     
