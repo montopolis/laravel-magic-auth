@@ -9,5 +9,6 @@ $router->group([
     'middleware' => "{$throttleMiddleware}:10,10",
 ], function (\Illuminate\Routing\Router $router) use ($controller) {
     $router->post('create', "$controller@postCreate");
+    $router->get('login', "$controller@getLogin");
     $router->post('verify', "$controller@postVerify");
 });
