@@ -1,6 +1,4 @@
-You can log-in automatically by clicking the following link:
-
-{{
+You can log-in automatically by clicking the following link: {{
     url('magic-auth/login') . '?' . implode('&', [
         "email={$key->email}",
         "_token={$key->token}",
@@ -8,4 +6,4 @@ You can log-in automatically by clicking the following link:
     ])
 }}
 
-You can log in using this temporary link for the next 5 minutes.
+This link will work for the next {{ round(config('montopolis_magic_auth.timeout') / 60, 0, PHP_ROUND_HALF_DOWN) }} minutes.

@@ -1,1 +1,1 @@
-Your temporary password is *{{$key->key}}*... You can log in using this temporary password for the next 5 minutes.
+Your temporary PIN number is *{{$key->key}}*... this is valid for the next {{ round(config('montopolis_magic_auth.timeout') / 60, 0, PHP_ROUND_HALF_DOWN) }} minutes
