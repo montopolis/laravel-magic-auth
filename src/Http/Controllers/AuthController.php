@@ -24,7 +24,7 @@ class AuthController extends Controller
      *
      * @return mixed
      */
-    public function postCreate(PostCreateRequest $request, KeyGenerator $keyGenerator, NotificationManager $notifier)
+    public function postCreate(PostCreateRequest $request, KeyGenerator $keyGenerator, NotificationManager $notifier, AdapterInterface $auth)
     {
         $email = $request->get('email');
         $token = $request->get('_token');
@@ -33,6 +33,10 @@ class AuthController extends Controller
 
         if (!$member) {
             throw new NotFoundHttpException("Could not find Slack user for email address: {$email}");
+        }
+        
+        if (!$auth->findByEmail($email)) {
+            throw new NotFoundHttpException("Could not find user account for email address: {$email}");
         }
         
         // @todo: trusted proxies
