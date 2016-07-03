@@ -32,11 +32,11 @@ class AuthController extends Controller
         $member = $this->findSlackMember($email);
 
         if (!$member) {
-            throw new NotFoundHttpException("Could not find Slack user for email address: {$email}");
+            return $this->exception(new NotFoundHttpException("Could not find Slack user for email address: {$email}"));
         }
         
         if (!$auth->findByEmail($email)) {
-            throw new NotFoundHttpException("Could not find user account for email address: {$email}");
+            return $this->exception(new NotFoundHttpException("Could not find user account for email address: {$email}"));
         }
         
         // @todo: trusted proxies
@@ -62,7 +62,7 @@ class AuthController extends Controller
     public function getLogin(Request $request, KeyGenerator $keyGenerator, AdapterInterface $auth)
     {
         if (!in_array(config('montopolis_magic_auth.mode'), ['link', 'both'])) {
-            throw new AccessDeniedHttpException('"link" authentication mode is not enabled');
+            return $this->exception(new AccessDeniedHttpException('"link" authentication mode is not enabled'));
         }
 
         $email = $request->get('email');
@@ -79,7 +79,7 @@ class AuthController extends Controller
             return redirect()->to('/');
         }
 
-        throw new AccessDeniedHttpException;
+        return $this->exception(new AccessDeniedHttpException);
     }
 
     /**
@@ -94,7 +94,7 @@ class AuthController extends Controller
     public function postVerify(PostVerifyRequest $request, KeyGenerator $keyGenerator, AdapterInterface $auth)
     {
         if (!in_array(config('montopolis_magic_auth.mode'), ['otp', 'both'])) {
-            throw new AccessDeniedHttpException('"otp" authentication mode is not enabled');
+            return $this->exception(new AccessDeniedHttpException('"otp" authentication mode is not enabled'));
         }
 
         $email = $request->get('email');
@@ -106,7 +106,7 @@ class AuthController extends Controller
             $auth->loginByEmail($email);
             redirect()->to('/');
         } else {
-            throw new AccessDeniedHttpException;
+            return $this->exception(new AccessDeniedHttpException);
         }
     }
 
@@ -122,5 +122,20 @@ class AuthController extends Controller
         $s = app()->make('Montopolis\MagicAuth\Integrations\Slack\Client');
         $member = $s->fetchByEmail($email);
         return $member;
+    }
+
+    /**
+     * @param $exception \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Exception
+     */
+    protected function exception($exception)
+    {
+        if (request()->isJson()) {
+            return response()->json([
+                'error' => $exception->getMessage(),
+            ], $exception->getStatusCode());
+        }
+        
+        throw $exception;
     }
 }
