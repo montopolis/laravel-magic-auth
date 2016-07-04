@@ -74,12 +74,13 @@ class AuthController extends Controller
         $user = $auth->findByEmail($email);
 
         if ($user && $keyGenerator->authenticate($email, $csrf, $ip, $key)) {
+
             // login user
             $auth->loginByEmail($email);
             return redirect()->to('/');
         }
 
-        return $this->exception(new AccessDeniedHttpException);
+        return $this->exception(new AccessDeniedHttpException('Authentication attempt failed. Try generating a new link.'));
     }
 
     /**
@@ -103,10 +104,17 @@ class AuthController extends Controller
         $key = $request->get('key');
 
         if ($keyGenerator->authenticate($email, $token, $ip, $key)) {
+
             $auth->loginByEmail($email);
+
+            if ($request->isJson()) {
+                return response()->json(['message' => 'Log in attempt successful.'], 200);
+            }
+
             return redirect()->to('/');
+            
         } else {
-            return $this->exception(new AccessDeniedHttpException);
+            return $this->exception(new AccessDeniedHttpException('Authentication attempt failed.'));
         }
     }
 
