@@ -19,7 +19,7 @@ class Migrate extends Migration
             $table->string('token', 100);
             $table->string('ip_address', 50);
             $table->string('key', 100);
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->nullable();
             $table->boolean('is_valid')->default(0);
             $table->unsignedInteger('attempts')->default(0);
 

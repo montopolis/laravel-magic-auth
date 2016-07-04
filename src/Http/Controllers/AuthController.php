@@ -104,7 +104,7 @@ class AuthController extends Controller
 
         if ($keyGenerator->authenticate($email, $token, $ip, $key)) {
             $auth->loginByEmail($email);
-            redirect()->to('/');
+            return redirect()->to('/');
         } else {
             return $this->exception(new AccessDeniedHttpException);
         }

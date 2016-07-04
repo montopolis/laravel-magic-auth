@@ -48,7 +48,7 @@ class KeyGenerator
             ->orderBy('created_at', 'DESC')
             ->first();
 
-        if ($keyObject->attempt($csrfToken, $key, $ipAddress)) {
+        if ($keyObject && $keyObject->attempt($csrfToken, $key, $ipAddress)) {
             return $email;
         } else {
             return false;
